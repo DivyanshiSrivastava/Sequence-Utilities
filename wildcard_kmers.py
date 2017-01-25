@@ -2,7 +2,7 @@ from __future__ import division
 import sys, os
 import itertools
 import numpy as np
-
+from collections import defaultdict
 
 """ getting a set of all possible wildcard kmers with at most 2 contigous N's """
 
@@ -23,7 +23,7 @@ def all_kmers():
 """ getting sequence specific kmers """
 
 def add_wildcards(kmer):
-	#  addinf wildcards to a kmes.	
+	#  adding wildcards to kmers.	
 	wildcard = []
 	for i in range(0,len(kmer)-1):
 		hold = kmer.copy()
@@ -40,6 +40,23 @@ def get_kmers(seq):
 	for kmer in kmers:
 		wkmers = np.vstack((wkmers,add_wildcards(kmer)))
 	print wkmers
+	print wkmers.shape
+	return wkmers
 
-get_kmers('ATGCGCTGC')
-print all_kmers()
+""" creating a dictionatry(that should implement a hash table, to allow O(n) time/(constant?) comparisons.) """
+
+def createhash(kmeruniverse):
+	kmerhash = dict()
+	for kmer in kmeruniverse:
+		kmerhash[str(kmer)] = 0
+	return kmerhash
+
+
+def map_to_hash(bound):
+	kmer_dict = createhash(all_kmers())
+	# bound is a list of sequences
+	for seq in bound:
+		kmerset = get_kmers(seq)
+		for kmer in kmerset:
+			kmer_dict[str(kmer)] += 1
+	return kmer_dict
