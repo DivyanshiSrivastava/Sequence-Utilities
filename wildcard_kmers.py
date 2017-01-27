@@ -18,6 +18,7 @@ def all_kmers():
 	# get a set of all possible strings from this alphabet.
 	space = list(set(itertools.product(('A','T','G','C','N','N'), repeat = 8)))
 	subset = np.array([prune(space[i]) for i in range(0,len(space))])
+	print np.asarray(space)[subset]
 	return np.asarray(space)[subset]
 
 """ getting sequence specific kmers """
@@ -39,8 +40,8 @@ def get_kmers(seq):
 	wkmers = np.empty((0,8), str)
 	for kmer in kmers:
 		wkmers = np.vstack((wkmers,add_wildcards(kmer)))
-	print wkmers
-	print wkmers.shape
+	#print wkmers
+	#print wkmers.shape
 	return wkmers
 
 """ creating a dictionatry(that should implement a hash table, to allow O(n) time/(constant?) comparisons.) """
@@ -51,12 +52,35 @@ def createhash(kmeruniverse):
 		kmerhash[str(kmer)] = 0
 	return kmerhash
 
+def map_to_hash(kmer_dict, seq):
+	kmerset = get_kmers(seq)
+	space = kmer_dict.copy()
+	for kmer in kmerset:
+		space[str(kmer)] = 1
+	return space
 
-def map_to_hash(bound):
-	kmer_dict = createhash(all_kmers())
-	# bound is a list of sequences
-	for seq in bound:
-		kmerset = get_kmers(seq)
-		for kmer in kmerset:
-			kmer_dict[str(kmer)] += 1
-	return kmer_dict
+# reading data from fasta extracted sequences:
+boundsites = np.genfromtxt("/Users/divyanshisrivastava/Desktop/Projects/data/iHoxc9.seq", dtype = str)
+
+# create the global mappable space.  
+kmer_dict = createhash(all_kmers())
+
+# map features to this space. 
+feature_martix = []
+idx = 1
+for sequence in boundsites:
+	# getting the seq features.
+	print "I am still at idx %s" % idx
+	idx += 1
+	seq_features = map_to_hash(kmer_dict, sequence)
+	feature_vector = []
+	# extracting from dict to list. 
+	for key, val in seq_features.iteritems():
+		feature_vector.append(val)
+	feature_martix.append(feature_vector)
+
+feature_martix = np.asarray(feature_martix)
+sub = feature_martix[:,np.sum(feature_martix, axis=0) > 1000]
+print feature_martix.shape
+print sub.shape
+np.savetxt("features", sub, fmt='%d', delimiter=',')
