@@ -13,6 +13,4 @@ elif [ "$FILETYPE" == "bed" ]; then
 fi
 
 ~/group/software/bedtools2/bin/bedtools getfasta -fi ~/group/lab/divyanshi/genomes/mm10/mm10.fa -bed $idx.bed -fo $idx.fa
-cat $idx.fa | grep -v ">" | awk ' { print toupper($0)}' | grep -v "N" > $idx.seq
-
-rm $idx.fa $idx.bed
+cat $idx.fa | grep -v ">" | awk ' { print toupper($0)}' > $idx.seq

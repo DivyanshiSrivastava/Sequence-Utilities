@@ -12,4 +12,4 @@ fw = np.genfromtxt(sys.argv[1] + ".seq", dtype= None)
 rcs = list()
 for seq in fw:
 	rcs.append(rc(seq.strip()))
-np.savetxt(sys.argv[1] + ".pos.seq", np.hstack((fw, np.array(rcs))),fmt = "%s", delimiter = '')
+np.savetxt(sys.argv[1] + ".seq", np.hstack((fw, np.array(rcs))),fmt = "%s", delimiter = '')
